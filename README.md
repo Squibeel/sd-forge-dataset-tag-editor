@@ -113,4 +113,3 @@ Input path in "Directory to save temporary files" and check "Force using tempora
 Check "Force image gallery to use temporary files" and input number in "Maximum resolution of ..." in the "Settings" tab.  
 It may not work with dataset with millions of images.  
 If it doesn't work, please consider using [**stand alone version**](https://github.com/toshiaki1729/dataset-tag-editor-standalone).  
-![](pic/ss12.png) 
