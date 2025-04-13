@@ -2,10 +2,10 @@
 # https://github.com/AUTOMATIC1111/stable-diffusion-webui-tokenizer/blob/master/scripts/tokenizer.py
 
 from typing import List
-from functools import reduce
-from ldm.modules.encoders.modules import FrozenCLIPEmbedder, FrozenOpenCLIPEmbedder
-from modules import shared, extra_networks, prompt_parser
-from modules.sd_hijack import model_hijack
+from modules import sd_hijack
+from modules import shared
+from scripts import logger
+
 import open_clip.tokenizer
 
 class VanillaClip:
@@ -29,20 +29,36 @@ class OpenClip:
     def byte_decoder(self):
         return self.tokenizer.byte_decoder
 
-def tokenize(text:str, use_raw_clip:bool=True):
-    if use_raw_clip:
-        tokens = shared.sd_model.cond_stage_model.tokenize([text])[0]
-        token_count = len(tokens)
-    else:
-        try:
-            text, _ = extra_networks.parse_prompt(text)
-            _, prompt_flat_list, _ = prompt_parser.get_multicond_prompt_list([text])
-            prompt = reduce(lambda list1, list2: list1+list2, prompt_flat_list)
-        except Exception:
-            prompt = text
-        token_chunks, token_count = model_hijack.clip.tokenize_line(prompt)
-        tokens = reduce(lambda list1, list2: list1+list2, [tc.tokens for tc in token_chunks])
-    return tokens, token_count
+def tokenize(text: str, use_raw_token=True):
+    if not hasattr(shared, 'sd_model') or shared.sd_model is None:
+        logger.error("shared.sd_model not available for tokenization.")
+        return ([], 0)
 
-def get_target_token_count(token_count:int):
-    return model_hijack.clip.get_target_prompt_token_count(token_count)
+    if not hasattr(shared.sd_model, 'get_prompt_lengths_on_ui'):
+        logger.error("Method 'get_prompt_lengths_on_ui' not found on shared.sd_model.")
+        return ([], 0)
+
+    try:
+        result = shared.sd_model.get_prompt_lengths_on_ui(text)
+
+        token_count = -1
+        if isinstance(result, int):
+            token_count = result
+        elif isinstance(result, (tuple, list)) and len(result) > 0 and isinstance(result[0], int):
+             token_count = result[0]
+        elif hasattr(result, 'item') and isinstance(result.item(), int):
+             token_count = result.item()
+
+        if token_count == -1:
+             logger.error(f"get_prompt_lengths_on_ui returned unexpected type: {type(result)}. Could not get count.")
+             return ([], 0)
+
+        tokens = []
+        return tokens, token_count
+    except Exception as e:
+        logger.error(f"Error calling shared.sd_model.get_prompt_lengths_on_ui for text '{text}': {e}")
+        return ([], 0)
+
+def get_target_token_count(token_count: int):
+     print("INFO: Using default calculation for target token count (75 per chunk).")
+     return (token_count // 75 + 1) * 75 if token_count > 0 else 75
