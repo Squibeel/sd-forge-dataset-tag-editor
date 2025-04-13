@@ -6,10 +6,20 @@ This is an extension to edit captions in training dataset for [Stable Diffusion 
 **Please note that this version is only somewhat in working order as I've got no idea what I'm doing.** 
 
 ## What Works:
-TESTING
+Tag Generation:
+- BLIP
+- BLIP2 (blip2-opt-2.7b-coco)
+- WD (wd-swinv2-tagger-v3, wd-vit-large-tagger-v3, wd-eva02-large-tagger-v3)
+Filter by Tags
+Batch Edit Captions
+Edit Caption of Selected Image:
+- Read Caption from Selected Image (Copy and Overwrite, Prepend and Append)
 
 ## What Doesn't Work:
-TESTING
+Edit Caption of Selected Image:
+- Interrogate Selected Image
+
+... Testing in Progress
 
 ## Installation
 ### Extensions tab on WebUI
