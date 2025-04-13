@@ -9,7 +9,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from modules import shared
-from modules.textual_inversion.dataset import re_numbers_at_start
+re_numbers_at_start = re.compile(r"^\d+")
 
 from scripts.singleton import Singleton
 
@@ -54,7 +54,6 @@ class DatasetTagEditor(Singleton):
         APPEND = 4
 
     def __init__(self):
-        # from modules.textual_inversion.dataset
         self.re_word = (
             re.compile(shared.opts.dataset_filename_word_regex)
             if len(shared.opts.dataset_filename_word_regex) > 0
@@ -75,11 +74,13 @@ class DatasetTagEditor(Singleton):
 
         def read_wd_batchsize(name:str):
             if "vit" in name:
-                return shared.opts.dataset_editor_batch_size_vit
+                return getattr(shared.opts, 'dataset_editor_batch_size_vit', 1)
             elif "convnext" in name:
-                return shared.opts.dataset_editor_batch_size_convnext
+                return getattr(shared.opts, 'dataset_editor_batch_size_convnext', 1)
             elif "swinv2" in name:
-                return shared.opts.dataset_editor_batch_size_swinv2
+                return getattr(shared.opts, 'dataset_editor_batch_size_swinv2', 1)
+            else:
+                return 1
         
         self.INTERROGATORS = (
             [taggers_builtin.BLIP()]
@@ -725,7 +726,6 @@ class DatasetTagEditor(Singleton):
                 text_path = img_path.with_suffix(caption_ext)
                 caption_text = ""
                 if interrogate_method != self.InterrogateMethod.OVERWRITE:
-                    # from modules/textual_inversion/dataset.py, modified
                     if text_path.is_file():
                         caption_text = text_path.read_text("utf8")
                     elif load_caption_from_filename:
@@ -852,7 +852,6 @@ class DatasetTagEditor(Singleton):
         for data in self.dataset.datas.values():
             img_path, tags = Path(data.imgpath), data.tags
             txt_path = img_path.with_suffix(caption_ext)
-            # make backup
             if backup and txt_path.is_file():
                 for extnum in range(1000):
                     bak_path = img_path.with_suffix(f".{extnum:0>3d}")
@@ -874,7 +873,6 @@ class DatasetTagEditor(Singleton):
                         )
                     else:
                         backup_num += 1
-            # save
             try:
                 txt_path.write_text(", ".join(tags), "utf8")
             except Exception as e:
@@ -915,22 +913,12 @@ class DatasetTagEditor(Singleton):
 
     def construct_tag_infos(self):
         self.tag_counts = {}
-        update_token_count = (
-            self.raw_clip_token_used is None
-            or self.raw_clip_token_used != shared.opts.dataset_editor_use_raw_clip_token
-        )
-
-        if update_token_count:
-            self.tag_tokens.clear()
-
+    
+        logger.write("Constructing tag counts...")
         for data in self.dataset.datas.values():
             for tag in data.tags:
                 if tag in self.tag_counts.keys():
                     self.tag_counts[tag] += 1
                 else:
                     self.tag_counts[tag] = 1
-                if tag not in self.tag_tokens:
-                    self.tag_tokens[tag] = clip_tokenizer.tokenize(
-                        tag, shared.opts.dataset_editor_use_raw_clip_token
-                    )
-        self.raw_clip_token_used = shared.opts.dataset_editor_use_raw_clip_token
+        logger.write(f"Tag counts constructed for {len(self.tag_counts)} unique tags.")
