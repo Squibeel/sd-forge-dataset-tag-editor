@@ -68,31 +68,47 @@ class EditCaptionOfSelectedImageUI(UIBase):
         def gallery_index_changed(next_idx:int, prev_idx:int, edit_caption: str, copy_automatically: bool, warn_change_not_saved: bool):
             next_idx = int(next_idx) if next_idx is not None else -1
             prev_idx = int(prev_idx) if prev_idx is not None else -1
+
             img_paths = dte_instance.get_filtered_imgpaths(filters=get_filters())
+
             prev_tags_txt = ''
             if 0 <= prev_idx and prev_idx < len(img_paths):
                 prev_tags_txt = ', '.join(dte_instance.get_tags_by_image_path(img_paths[prev_idx]))
             else:
                 prev_idx = -1
-            
+
             next_tags_txt = ''
             if 0 <= next_idx and next_idx < len(img_paths):
                 next_tags_txt = ', '.join(dte_instance.get_tags_by_image_path(img_paths[next_idx]))
-                
-            return\
-                [prev_idx if warn_change_not_saved and edit_caption != prev_tags_txt and not self.change_is_saved else -1] +\
-                [next_tags_txt, next_tags_txt if copy_automatically else edit_caption] +\
-                [edit_caption]
+
+            edit_caption_value = next_tags_txt if copy_automatically else edit_caption
+
+            caption_counter_html = update_token_counter(next_tags_txt)
+            edit_caption_counter_html = update_token_counter(edit_caption_value)
+
+            return \
+                [prev_idx if warn_change_not_saved and edit_caption != prev_tags_txt and not self.change_is_saved else -1] + \
+                [next_tags_txt, edit_caption_value] + \
+                [edit_caption] + \
+                [caption_counter_html, edit_caption_counter_html]
 
         self.nb_hidden_image_index_save_or_not.change(
             fn=lambda a:None,
             _js='(a) => dataset_tag_editor_ask_save_change_or_not(a)',
             inputs=self.nb_hidden_image_index_save_or_not
         )
-        dataset_gallery.nb_hidden_image_index.change(lambda:None).then(
+        dataset_gallery.nb_hidden_image_index.change(lambda: None
+        ).then(
             fn=gallery_index_changed,
             inputs=[dataset_gallery.nb_hidden_image_index, dataset_gallery.nb_hidden_image_index_prev, self.tb_edit_caption, self.cb_copy_caption_automatically, self.cb_ask_save_when_caption_changed],
-            outputs=[self.nb_hidden_image_index_save_or_not] + [self.tb_caption, self.tb_edit_caption] + [self.tb_hidden_edit_caption]
+            outputs=[
+                self.nb_hidden_image_index_save_or_not,
+                self.tb_caption,
+                self.tb_edit_caption,
+                self.tb_hidden_edit_caption,
+                self.token_counter_caption,
+                self.token_counter_edit_caption
+                ]
         )
 
         def change_selected_image_caption(tags_text: str, idx:int, sort: bool, sort_by:str, sort_order:str):
@@ -134,17 +150,23 @@ class EditCaptionOfSelectedImageUI(UIBase):
         )
 
         def interrogate_selected_image(interrogator_name: str, use_threshold_booru: bool, threshold_booru: float, use_threshold_waifu: bool, threshold_waifu: float, threshold_z3d: float):
-            
             if not interrogator_name:
-                return ''
+                 return ['', update_token_counter('')]
             threshold_booru = threshold_booru if use_threshold_booru else shared.opts.interrogate_deepbooru_score_threshold
             threshold_waifu = threshold_waifu if use_threshold_waifu else -1
-            return dte_instance.interrogate_image(dataset_gallery.selected_path, interrogator_name, threshold_booru, threshold_waifu, threshold_z3d)
+            interrogate_result_text = dte_instance.interrogate_image(dataset_gallery.selected_path, interrogator_name, threshold_booru, threshold_waifu, threshold_z3d)
+
+            interrogate_counter_html = update_token_counter(interrogate_result_text)
+
+            return [interrogate_result_text, interrogate_counter_html]
 
         self.btn_interrogate_si.click(
             fn=interrogate_selected_image,
             inputs=[self.dd_intterogator_names_si, load_dataset.cb_use_custom_threshold_booru, load_dataset.sl_custom_threshold_booru, load_dataset.cb_use_custom_threshold_waifu, load_dataset.sl_custom_threshold_waifu, load_dataset.sl_custom_threshold_z3d],
-            outputs=[self.tb_interrogate]
+            outputs=[
+                self.tb_interrogate,
+                self.token_counter_interrogate
+                ]
         )
 
         self.btn_copy_interrogate.click(
