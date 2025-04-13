@@ -2,10 +2,6 @@ let dteModifiedGallery_dataset = new DTEModifiedGallery()
 let dteModifiedGallery_filter = new DTEModifiedGallery()
 
 
-function dataset_tag_editor_gl_dataset_images_selected_index() {
-    return dteModifiedGallery_dataset.getSelectedIndex()
-}
-
 function dataset_tag_editor_gl_filter_images_selected_index() {
     return dteModifiedGallery_filter.getSelectedIndex()
 }
@@ -26,15 +22,6 @@ function dataset_tag_editor_gl_dataset_images_close() {
 
 function dataset_tag_editor_gl_filter_images_close() {
     dteModifiedGallery_filter.clickClose()
-}
-
-let dataset_tag_editor_gl_dataset_images_clicked = function () {
-    dteModifiedGallery_dataset.updateFilter()
-    dteModifiedGallery_dataset.clickHandler()
-    let set_button = gradioApp().getElementById("dataset_tag_editor_btn_hidden_set_index");
-    if(set_button){
-        set_button.click()
-    }
 }
 
 let dataset_tag_editor_gl_dataset_images_next_clicked = function () {
@@ -126,14 +113,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if(elem_gl_dataset){
             dteModifiedGallery_dataset.setElement(elem_gl_dataset)
             dteModifiedGallery_dataset.addKeyHandler(dataset_tag_editor_gl_dataset_images_key_handler)
-            dteModifiedGallery_dataset.addClickHandler(dataset_tag_editor_gl_dataset_images_clicked)
             dteModifiedGallery_dataset.addClickNextHandler(dataset_tag_editor_gl_dataset_images_next_clicked)
             dteModifiedGallery_dataset.addClickCloseHandler(dataset_tag_editor_gl_dataset_images_close_clicked)
         }
         if(elem_gl_filter){
             dteModifiedGallery_filter.setElement(elem_gl_filter)
             dteModifiedGallery_filter.addKeyHandler(dataset_tag_editor_gl_filter_images_key_handler)
-            dteModifiedGallery_filter.addClickHandler(dataset_tag_editor_gl_filter_images_clicked)
             dteModifiedGallery_filter.addClickNextHandler(dataset_tag_editor_gl_filter_images_next_clicked)
             dteModifiedGallery_filter.addClickCloseHandler(dataset_tag_editor_gl_filter_images_close_clicked)
         }
