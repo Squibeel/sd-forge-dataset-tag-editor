@@ -9,7 +9,7 @@ This is an extension to edit captions in training dataset for [Stable Diffusion 
 Tag Generation:
 - BLIP
 - BLIP2 (blip2-opt-2.7b-coco)
-- WD (wd-swinv2-tagger-v3, wd-vit-large-tagger-v3, wd-eva02-large-tagger-v3)
+- WD (All)
   
 Filter by Tags
 
@@ -19,6 +19,9 @@ Edit Caption of Selected Image:
 - Read Caption from Selected Image (Copy and Overwrite, Prepend and Append)
 
 ## What Doesn't Work:
+Tag Generation:
+- BLIP2 (blip2-opt-2.7b)
+  
 Edit Caption of Selected Image:
 - Interrogate Selected Image
 
