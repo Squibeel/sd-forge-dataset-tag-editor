@@ -10,8 +10,11 @@ Tag Generation:
 - BLIP
 - BLIP2 (blip2-opt-2.7b-coco)
 - WD (wd-swinv2-tagger-v3, wd-vit-large-tagger-v3, wd-eva02-large-tagger-v3)
+  
 Filter by Tags
+
 Batch Edit Captions
+
 Edit Caption of Selected Image:
 - Read Caption from Selected Image (Copy and Overwrite, Prepend and Append)
 
