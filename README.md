@@ -84,14 +84,12 @@ Please note that all batch editing will be applyed **only to displayed images (=
   1. Go to "Batch Edit Captions" tab
   1. Append tags to "Edit tags" textbox
   1. Push "Apply changes to filtered images" button  
-  ![](pic/ss08.png)  
   "foo" and "bar" will be added to all images displayed.
 
 - **I want to replace the tags which are common to displayed images**
   1. Go to "Batch Edit Captions" tab
   1. Replace tags in "Edit tags" textbox
   1. Push "Apply changes to filtered images" button  
-  ![](pic/ss09.png)  
   "male focus" and "solo" will be replaced with "foo" and "bar".
 
 - **I want to remove some tags**  
@@ -101,7 +99,6 @@ Please note that all batch editing will be applyed **only to displayed images (=
 - **I want to add/replace/remove tags more flexibly**
   1. Go to "Batch Edit Captions" tab
   2. Use "Search and Replace" with "Use regex" checked  
-  ![](pic/ss10.png)  
   "1boy", "2boys", … will be replaced with "1girl", "2girls", … in each tags of images displayed.  
   A comma will be regarded as the sepalator of two tags.  
   By using regex, you can add/replace/remove tags according to more complex conditions.
@@ -117,8 +114,3 @@ Check "Force image gallery to use temporary files" and input number in "Maximum 
 It may not work with dataset with millions of images.  
 If it doesn't work, please consider using [**stand alone version**](https://github.com/toshiaki1729/dataset-tag-editor-standalone).  
 ![](pic/ss12.png) 
-
-
-## Description of Display
-
-Moved to [here](DESCRIPTION_OF_DISPLAY.md)
